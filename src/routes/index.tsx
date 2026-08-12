@@ -5,7 +5,6 @@ import { useContent, type BlogPost, type PortfolioItem } from "@/store/content";
 import HermesWorkstation from "@/components/HermesWorkstation";
 import { AdminTrigger } from "@/components/AdminPanel";
 import { PortfolioGallery } from "@/components/PortfolioGallery";
-import { ClientLogos } from "@/components/ClientLogos";
 import hero from "@/assets/hero.jpg";
 import mqLogo from "@/assets/mq-logo.png";
 import b1 from "@/assets/blog-1.jpg";
@@ -278,7 +277,6 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <ClientLogos />
 
       <footer className="px-6 lg:px-10 pt-12 pb-6 mt-8 border-t border-line">
         <div className="grid grid-cols-12 gap-4 items-center text-[10px] uppercase tracking-[0.14em]">
