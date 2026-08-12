@@ -102,6 +102,10 @@ function Index() {
                 <div>{content.hero.subtitle1}</div>
                 <div>{content.hero.subtitle2}</div>
               </div>
+              <div className="mt-5 md:mt-8 inline-flex items-center gap-2 border border-accent/40 bg-accent/10 px-3 py-1.5 rounded-full text-[10px] md:text-[11px] uppercase tracking-[0.12em] text-ink">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                Site under construction — refresh later for updates
+              </div>
             </div>
           </div>
         </div>
