@@ -409,7 +409,7 @@ function WorkspaceMediaManager({
 export function AdminPanel({ onClose, passkey }: { onClose: () => void; passkey: string }) {
   const { content, save, saving, reset } = useContent();
   const [c, setC] = useState<Content>(content);
-  const [tab, setTab] = useState<"header" | "hero" | "blog" | "portfolio" | "workspace" | "footer" | "socials" | "clients" | "legal" | "pricing">("header");
+  const [tab, setTab] = useState<"header" | "hero" | "blog" | "portfolio" | "workspace" | "footer" | "socials" | "legal" | "pricing">("header");
   const [err, setErr] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const lastSavedJson = useRef(JSON.stringify(content));
@@ -510,7 +510,7 @@ export function AdminPanel({ onClose, passkey }: { onClose: () => void; passkey:
         {!err && syncing && <div className="label text-ink-dim mb-3">SYNCING TO BACKEND...</div>}
 
         <div className="flex gap-1 mb-4 border-b border-line">
-          {(["header", "hero", "blog", "portfolio", "workspace", "pricing", "footer", "socials", "clients", "legal"] as const).map((t) => (
+          {(["header", "hero", "blog", "portfolio", "workspace", "pricing", "footer", "socials", "legal"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -1223,109 +1223,6 @@ export function AdminPanel({ onClose, passkey }: { onClose: () => void; passkey:
               className="label px-3 py-2 border border-line hover:border-accent"
             >
               + ADD SOCIAL
-            </button>
-          </div>
-        )}
-
-        {tab === "clients" && (
-          <div className="space-y-3">
-            <div className="label text-ink-dim">
-              Client logos shown above the footer. Transparent PNG works best.
-            </div>
-            {(c.clients || []).map((cl, i) => (
-              <div key={cl.id} className="border border-line p-3 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="label">{String(i + 1).padStart(2, "0")} — {cl.name || "UNTITLED"}</span>
-                  <div className="flex gap-2">
-                    <button
-                      disabled={i === 0}
-                      onClick={() => {
-                        const arr = [...(c.clients || [])];
-                        [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]];
-                        void commit({ ...c, clients: arr });
-                      }}
-                      className="label disabled:opacity-30"
-                    >↑</button>
-                    <button
-                      disabled={i === (c.clients || []).length - 1}
-                      onClick={() => {
-                        const arr = [...(c.clients || [])];
-                        [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]];
-                        void commit({ ...c, clients: arr });
-                      }}
-                      className="label disabled:opacity-30"
-                    >↓</button>
-                    <button
-                      onClick={() =>
-                        void commit({ ...c, clients: (c.clients || []).filter((_, j) => j !== i) }, cl.logo)
-                      }
-                      className="label text-accent"
-                    >DELETE</button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <ImageField
-                    label="logo"
-                    value={cl.logo}
-                    passkey={passkey}
-                    onChange={(nv) =>
-                      commit(
-                        { ...c, clients: (c.clients || []).map((x, j) => (j === i ? { ...x, logo: nv } : x)) },
-                        cl.logo,
-                      )
-                    }
-                    onDelete={() =>
-                      commit(
-                        { ...c, clients: (c.clients || []).map((x, j) => (j === i ? { ...x, logo: "" } : x)) },
-                        cl.logo,
-                      )
-                    }
-                  />
-                  <div className="space-y-2">
-                    <Field
-                      label="name"
-                      value={cl.name}
-                      onChange={(nv) =>
-                        upd("clients", (c.clients || []).map((x, j) => (j === i ? { ...x, name: nv } : x)))
-                      }
-                    />
-                    <Field
-                      label="url"
-                      value={cl.url}
-                      onChange={(nv) =>
-                        upd("clients", (c.clients || []).map((x, j) => (j === i ? { ...x, url: nv } : x)))
-                      }
-                    />
-                    <label className="label flex items-center gap-2 text-ink-dim">
-                      <input
-                        type="checkbox"
-                        checked={!!cl.monoOnDark}
-                        onChange={(e) =>
-                          upd(
-                            "clients",
-                            (c.clients || []).map((x, j) => (j === i ? { ...x, monoOnDark: e.target.checked } : x)),
-                          )
-                        }
-                      />
-                      WHITE SILHOUETTE IN DARK MODE
-                    </label>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <button
-              onClick={() =>
-                void commit({
-                  ...c,
-                  clients: [
-                    ...(c.clients || []),
-                    { id: String(Date.now()), name: "NEW CLIENT", logo: "", url: "https://" },
-                  ],
-                })
-              }
-              className="label px-3 py-2 border border-line hover:border-accent"
-            >
-              + ADD CLIENT
             </button>
           </div>
         )}
