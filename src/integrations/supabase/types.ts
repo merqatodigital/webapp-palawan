@@ -355,7 +355,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      hide_workspace_project: {
+        Args: { _actor: string; _project_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
