@@ -366,11 +366,21 @@ function DemoChat() {
           Talk to Palawan AI Operator Now
         </h2>
         <p className="mt-2 text-ink-dim text-[12px] max-w-xl">
-          Powered by {connectionLabel(conn)} — bring your own OpenRouter key or your local Ollama models.
+          Bring your own AI: paste an OpenRouter key and pick any free model, or connect the models
+          installed on your own device with Ollama.
         </p>
-        <div className="mt-3">
-          <AiConnectionButton />
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <AiConnectionButton variant="primary" />
+          <span className="text-[10px] uppercase tracking-[0.14em] text-ink-mute inline-flex items-center gap-1.5">
+            <StatusDot state={isConfigured(conn) ? "ok" : "error"} /> {connectionLabel(conn)}
+          </span>
         </div>
+        {!isConfigured(conn) && (
+          <div className="mt-3 border border-accent/40 bg-accent/5 px-3 py-2 text-[11px] text-ink-dim max-w-xl">
+            No AI connected yet — click <span className="text-accent">Choose free model / API key</span> above to
+            pick a free OpenRouter model or detect your local Ollama models.
+          </div>
+        )}
       </div>
 
       {/* Chat container */}

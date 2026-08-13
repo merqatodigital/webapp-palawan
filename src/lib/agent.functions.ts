@@ -45,36 +45,6 @@ Rules:
 - Use simple, clear English`;
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-async function callLovable(messages: Message[], systemPrompt: string, key: string) {
-  if (!key) return null;
-
-  const response = await fetch(LOVABLE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": key,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3.6-flash",
-      messages: [{ role: "system", content: systemPrompt }, ...messages],
-      max_tokens: 800,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    if (response.status === 429) throw new Error("rate_limited");
-    if (response.status === 402) throw new Error("credits_exhausted");
-    throw new Error(`Lovable AI HTTP ${response.status}: ${detail.slice(0, 200)}`);
-  }
-
-  const json = await response.json();
-  return json.choices?.[0]?.message?.content || "";
-}
-
 async function callOpenRouter(messages: Message[], systemPrompt: string, key: string, model: string) {
   if (!key) return null;
 
@@ -138,20 +108,7 @@ export const chatWithAgent = createServerFn({ method: "POST" })
     const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
     const ollamaModel = process.env.AI_MODEL || "llama3.2:3b";
 
-    // Primary: Lovable AI (Site AI)
-    try {
-      const content = await callLovable(recentMessages, systemPrompt, process.env.LOVABLE_API_KEY || "");
-      if (content) return { content, ok: true };
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      if (msg === "rate_limited")
-        return { content: "⚠️ Site AI is rate limited right now. Wait a moment, or switch to your own key in AI Connection.", ok: false };
-      if (msg === "credits_exhausted")
-        return { content: "⚠️ Site AI credits are used up. Use your own OpenRouter key or local Ollama in AI Connection.", ok: false };
-      console.error("Lovable AI error:", err);
-    }
-
-    // Fallback: OpenRouter (server key)
+    // OpenRouter (server key)
     try {
       const content = await callOpenRouter(recentMessages, systemPrompt, openRouterKey, openRouterModel);
       if (content) return { content, ok: true };
@@ -169,7 +126,7 @@ export const chatWithAgent = createServerFn({ method: "POST" })
 
     return {
       content:
-        "⚠️ Site AI is unreachable right now. Open AI Connection and use your own OpenRouter key or your local Ollama models.",
+        "⚠️ No AI is connected. Open AI Connection and add your own OpenRouter key (free models available) or connect your local Ollama.",
       ok: false,
     };
   });

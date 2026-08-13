@@ -56,7 +56,15 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
 
   const loadModels = async (force = false) => {
     setLoadingModels(true); setModelError(null);
-    try { setModels(await listOpenRouterModels(force)); }
+    try {
+      const list = await listOpenRouterModels(force);
+      setModels(list);
+      const free = list.filter((m) => m.free);
+      if (free.length > 0 && !list.some((m) => m.id === conn.openrouterModel)) {
+        const preferred = free.find((m) => m.multimodal) ?? free[0];
+        update({ openrouterModel: preferred.id });
+      }
+    }
     catch (e) { setModelError(e instanceof Error ? e.message : "Could not load models."); }
     finally { setLoadingModels(false); }
   };
@@ -111,11 +119,9 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
 
         <div className="p-5 flex flex-col gap-3">
           <p className="text-[11px] text-ink-dim leading-relaxed">
-            Choose which AI powers the tools on this site. Your key and your local address stay in this
-            browser — they are never sent to our servers.
+            Pick the AI that powers the tools on this site: your own OpenRouter key (free models included)
+            or the models installed on your own device via Ollama. Your key and address stay in this browser.
           </p>
-
-          <Row id="site" title="Site AI" desc="Works out of the box, no setup. Runs on merQato's own AI." dot={conn.provider === "site" ? "ok" : "idle"} />
 
           <Row
             id="openrouter"
@@ -242,7 +248,10 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function AiConnectionButton({ className = "" }: { className?: string }) {
+export function AiConnectionButton({
+  className = "",
+  variant = "ghost",
+}: { className?: string; variant?: "ghost" | "primary" }) {
   const [open, setOpen] = useState(false);
   const [conn, setConn] = useState<AiConnection | null>(null);
 
@@ -257,11 +266,21 @@ export function AiConnectionButton({ className = "" }: { className?: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center gap-1.5 border border-line px-2.5 py-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-dim hover:border-accent hover:text-accent transition-colors ${className}`}
+        className={
+          variant === "primary"
+            ? `inline-flex items-center gap-2 border border-accent bg-accent/10 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-accent hover:bg-accent hover:text-background transition-all ${className}`
+            : `inline-flex items-center gap-1.5 border border-line px-2.5 py-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-dim hover:border-accent hover:text-accent transition-colors ${className}`
+        }
       >
-        <Settings2 className="w-3 h-3" />
-        <span className="hidden sm:inline">{conn ? connectionLabel(conn) : "AI CONNECTION"}</span>
-        <span className="sm:hidden">AI</span>
+        <Settings2 className="w-3.5 h-3.5" />
+        {variant === "primary" ? (
+          <span>Choose free model / API key</span>
+        ) : (
+          <>
+            <span className="hidden sm:inline">{conn ? connectionLabel(conn) : "AI CONNECTION"}</span>
+            <span className="sm:hidden">AI</span>
+          </>
+        )}
         <StatusDot state={conn && isConfigured(conn) ? "ok" : "idle"} />
       </button>
       {open && <AiConnectionPanel onClose={() => setOpen(false)} />}
