@@ -56,7 +56,15 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
 
   const loadModels = async (force = false) => {
     setLoadingModels(true); setModelError(null);
-    try { setModels(await listOpenRouterModels(force)); }
+    try {
+      const list = await listOpenRouterModels(force);
+      setModels(list);
+      const free = list.filter((m) => m.free);
+      if (free.length > 0 && !list.some((m) => m.id === conn.openrouterModel)) {
+        const preferred = free.find((m) => m.multimodal) ?? free[0];
+        update({ openrouterModel: preferred.id });
+      }
+    }
     catch (e) { setModelError(e instanceof Error ? e.message : "Could not load models."); }
     finally { setLoadingModels(false); }
   };
