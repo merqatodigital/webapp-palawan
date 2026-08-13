@@ -383,3 +383,11 @@ export async function toggleFollow(projectId: string, active: boolean) {
     if (error) throw new Error(error.message);
   }
 }
+
+export function statusTone(status: string) {
+  const s = (status || "").toUpperCase();
+  if (s.includes("LIVE")) return "text-accent border-accent/40";
+  if (s.includes("BUILD")) return "text-amber-400 border-amber-400/40";
+  if (s.includes("READY")) return "text-blue-400 border-blue-400/40";
+  return "text-ink-dim border-line-soft";
+}

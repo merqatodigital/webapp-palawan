@@ -9,14 +9,13 @@ import mqLogo from "@/assets/mq-logo.png";
 import { AdminTrigger } from "@/components/AdminPanel";
 import { WorkspaceMediaGallery } from "@/components/WorkspaceMediaGallery";
 import { ProjectComments } from "@/components/ProjectComments";
-import { statusTone } from "@/routes/workspace";
 import {
   REACTIONS, STATUSES,
   addLink, addMedia, addTask, addUpdate,
   fetchFollows, fetchLinks, fetchMedia, fetchProject, fetchReactions, fetchTasks, fetchUpdates,
   getVisitorName, getVisitorToken, hideProject, isValidUrl, normalizeUrl,
   removeLink, removeMedia, removeTask, setVisitorName, toggleFollow, toggleReaction, toggleTask,
-  updateProject, uploadFile,
+  statusTone, updateProject, uploadFile,
   type WsMedia,
 } from "@/lib/workspace-api";
 

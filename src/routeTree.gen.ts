@@ -16,6 +16,7 @@ import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceProjectIdRouteImport } from './routes/workspace.$projectId'
 import { Route as ApiPublicBuildIdRouteImport } from './routes/api/public/build-id'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceProjectIdRoute = WorkspaceProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 const ApiPublicBuildIdRoute = ApiPublicBuildIdRouteImport.update({
   id: '/api/public/build-id',
   path: '/api/public/build-id',
@@ -66,7 +72,8 @@ export interface FileRoutesByFullPath {
   '/disclaimer': typeof DisclaimerRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/$projectId': typeof WorkspaceProjectIdRoute
   '/api/public/build-id': typeof ApiPublicBuildIdRoute
 }
 export interface FileRoutesByTo {
@@ -76,7 +83,8 @@ export interface FileRoutesByTo {
   '/disclaimer': typeof DisclaimerRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/$projectId': typeof WorkspaceProjectIdRoute
   '/api/public/build-id': typeof ApiPublicBuildIdRoute
 }
 export interface FileRoutesById {
@@ -87,7 +95,8 @@ export interface FileRoutesById {
   '/disclaimer': typeof DisclaimerRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/workspace': typeof WorkspaceRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/$projectId': typeof WorkspaceProjectIdRoute
   '/api/public/build-id': typeof ApiPublicBuildIdRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/workspace'
+    | '/workspace/$projectId'
     | '/api/public/build-id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/workspace'
+    | '/workspace/$projectId'
     | '/api/public/build-id'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/workspace'
+    | '/workspace/$projectId'
     | '/api/public/build-id'
   fileRoutesById: FileRoutesById
 }
@@ -130,7 +142,7 @@ export interface RootRouteChildren {
   DisclaimerRoute: typeof DisclaimerRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
-  WorkspaceRoute: typeof WorkspaceRoute
+  WorkspaceRoute: typeof WorkspaceRouteWithChildren
   ApiPublicBuildIdRoute: typeof ApiPublicBuildIdRoute
 }
 
@@ -185,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workspace/$projectId': {
+      id: '/workspace/$projectId'
+      path: '/$projectId'
+      fullPath: '/workspace/$projectId'
+      preLoaderRoute: typeof WorkspaceProjectIdRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
     '/api/public/build-id': {
       id: '/api/public/build-id'
       path: '/api/public/build-id'
@@ -195,6 +214,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface WorkspaceRouteChildren {
+  WorkspaceProjectIdRoute: typeof WorkspaceProjectIdRoute
+}
+
+const WorkspaceRouteChildren: WorkspaceRouteChildren = {
+  WorkspaceProjectIdRoute: WorkspaceProjectIdRoute,
+}
+
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
+  WorkspaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgentsRoute: AgentsRoute,
@@ -202,7 +233,7 @@ const rootRouteChildren: RootRouteChildren = {
   DisclaimerRoute: DisclaimerRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
-  WorkspaceRoute: WorkspaceRoute,
+  WorkspaceRoute: WorkspaceRouteWithChildren,
   ApiPublicBuildIdRoute: ApiPublicBuildIdRoute,
 }
 export const routeTree = rootRouteImport
