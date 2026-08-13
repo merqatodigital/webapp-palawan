@@ -240,7 +240,10 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function AiConnectionButton({ className = "" }: { className?: string }) {
+export function AiConnectionButton({
+  className = "",
+  variant = "ghost",
+}: { className?: string; variant?: "ghost" | "primary" }) {
   const [open, setOpen] = useState(false);
   const [conn, setConn] = useState<AiConnection | null>(null);
 
@@ -255,11 +258,21 @@ export function AiConnectionButton({ className = "" }: { className?: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center gap-1.5 border border-line px-2.5 py-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-dim hover:border-accent hover:text-accent transition-colors ${className}`}
+        className={
+          variant === "primary"
+            ? `inline-flex items-center gap-2 border border-accent bg-accent/10 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-accent hover:bg-accent hover:text-background transition-all ${className}`
+            : `inline-flex items-center gap-1.5 border border-line px-2.5 py-1.5 text-[9px] uppercase tracking-[0.14em] text-ink-dim hover:border-accent hover:text-accent transition-colors ${className}`
+        }
       >
-        <Settings2 className="w-3 h-3" />
-        <span className="hidden sm:inline">{conn ? connectionLabel(conn) : "AI CONNECTION"}</span>
-        <span className="sm:hidden">AI</span>
+        <Settings2 className="w-3.5 h-3.5" />
+        {variant === "primary" ? (
+          <span>Choose free model / API key</span>
+        ) : (
+          <>
+            <span className="hidden sm:inline">{conn ? connectionLabel(conn) : "AI CONNECTION"}</span>
+            <span className="sm:hidden">AI</span>
+          </>
+        )}
         <StatusDot state={conn && isConfigured(conn) ? "ok" : "idle"} />
       </button>
       {open && <AiConnectionPanel onClose={() => setOpen(false)} />}
