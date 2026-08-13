@@ -7,7 +7,11 @@ import {
   Github, Triangle, Instagram, Twitter, Linkedin, Loader2, Paperclip,
 } from "lucide-react";
 import mqLogo from "@/assets/mq-logo.png";
-import { chatWithAgent } from "@/lib/agent.functions";
+import {
+  DEFAULT_CONNECTION, connectionLabel, isConfigured, loadConnection, sendChat,
+  type AiConnection, type ChatMessage,
+} from "@/lib/ai-connection";
+import { AiConnectionButton, StatusDot } from "@/components/AiConnectionPanel";
 import { useContent } from "@/store/content";
 import type { PricingTier } from "@/store/content";
 import { AdminTrigger } from "@/components/AdminPanel";
@@ -230,6 +234,13 @@ function DemoChat() {
   const [loading, setLoading] = useState(false);
   const [typingText, setTypingText] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
+  const [conn, setConn] = useState<AiConnection>(DEFAULT_CONNECTION);
+  useEffect(() => {
+    const sync = () => setConn(loadConnection());
+    sync();
+    window.addEventListener("mq-ai-connection-change", sync);
+    return () => window.removeEventListener("mq-ai-connection-change", sync);
+  }, []);
   const [messages, setMessages] = useState<
     Array<{ role: string; content: string; images?: string[] }>
   >([
@@ -303,23 +314,23 @@ function DemoChat() {
           }
           return { role, content: m.content };
         });
-        const res = await chatWithAgent({ data: { messages: apiMessages } });
+        const res = await sendChat(conn, apiMessages as ChatMessage[]);
         const reply = res.content || "Sorry, I couldn't process that.";
         setMessages((prev) => [...prev, { role: "ai", content: reply }]);
-      } catch {
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : "Unknown error.";
         setMessages((prev) => [
           ...prev,
           {
             role: "ai",
-            content:
-              "Hmm, I hit a connection issue. Make sure Ollama is running locally (`ollama serve`) and try again.",
+            content: `⚠️ ${detail}\n\nOpen "AI Connection" above to switch provider, paste your own OpenRouter key, or connect your local Ollama.`,
           },
         ]);
       } finally {
         setLoading(false);
       }
     },
-    [messages],
+    [messages, conn],
   );
 
   const handleSend = () => {
@@ -355,8 +366,11 @@ function DemoChat() {
           Talk to Palawan AI Operator Now
         </h2>
         <p className="mt-2 text-ink-dim text-[12px] max-w-xl">
-          Powered by {import.meta.env.DEV ? "Ollama (local)" : "Cloudflare AI"} — responses are streamed in real time.
+          Powered by {connectionLabel(conn)} — bring your own OpenRouter key or your local Ollama models.
         </p>
+        <div className="mt-3">
+          <AiConnectionButton />
+        </div>
       </div>
 
       {/* Chat container */}
@@ -370,7 +384,10 @@ function DemoChat() {
             <span className="text-accent">OPERATOR TERMINAL</span>
             <span className="text-ink-dim">/ {loading ? "THINKING" : "ONLINE"}</span>
           </div>
-          <div className="text-[9px] text-ink-mute uppercase tracking-[0.14em]">LIVE</div>
+          <div className="text-[9px] text-ink-mute uppercase tracking-[0.14em] flex items-center gap-1.5">
+            <StatusDot state={isConfigured(conn) ? "ok" : "error"} />
+            {connectionLabel(conn)}
+          </div>
         </div>
 
         {/* Messages */}
