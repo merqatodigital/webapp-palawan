@@ -297,9 +297,11 @@ export async function updateProject(id: string, draft: Partial<ProjectDraft>, ac
 }
 
 export async function hideProject(id: string, actor: string) {
-  const { error } = await supabase.from("workspace_projects").update({ is_hidden: true } as never).eq("id", id);
+  const { error } = await (supabase.rpc as (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }>)(
+    "hide_workspace_project",
+    { _project_id: id, _actor: actor || "Anonymous" },
+  );
   if (error) throw new Error(error.message);
-  await logRevision(id, "delete", { actor });
 }
 
 export async function addMedia(projectId: string, kind: WsMedia["kind"], url: string, sortOrder: number) {
