@@ -111,11 +111,9 @@ export function AiConnectionPanel({ onClose }: { onClose: () => void }) {
 
         <div className="p-5 flex flex-col gap-3">
           <p className="text-[11px] text-ink-dim leading-relaxed">
-            Choose which AI powers the tools on this site. Your key and your local address stay in this
-            browser — they are never sent to our servers.
+            Pick the AI that powers the tools on this site: your own OpenRouter key (free models included)
+            or the models installed on your own device via Ollama. Your key and address stay in this browser.
           </p>
-
-          <Row id="site" title="Site AI" desc="Works out of the box, no setup. Runs on merQato's own AI." dot={conn.provider === "site" ? "ok" : "idle"} />
 
           <Row
             id="openrouter"

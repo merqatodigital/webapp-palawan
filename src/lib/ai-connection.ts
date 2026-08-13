@@ -1,6 +1,4 @@
-import { chatWithAgent } from "@/lib/agent.functions";
-
-export type ProviderId = "site" | "openrouter" | "ollama";
+export type ProviderId = "openrouter" | "ollama";
 export type ProbeState = "idle" | "testing" | "ok" | "error";
 
 export type AiConnection = {
@@ -31,7 +29,7 @@ export type ModelOption = {
 const STORAGE_KEY = "mq_ai_connection";
 
 export const DEFAULT_CONNECTION: AiConnection = {
-  provider: "site",
+  provider: "openrouter",
   openrouterKey: "",
   openrouterModel: "google/gemma-3-27b-it:free",
   ollamaUrl: "http://localhost:11434",
@@ -60,16 +58,12 @@ export function connectionLabel(conn: AiConnection): string {
     const short = conn.openrouterModel.split("/").pop() ?? conn.openrouterModel;
     return `OPENROUTER · ${short.replace(":free", " FREE").toUpperCase()}`;
   }
-  if (conn.provider === "ollama") {
-    return `OLLAMA · ${(conn.ollamaModel || "NO MODEL").toUpperCase()}`;
-  }
-  return "SITE AI";
+  return `OLLAMA · ${(conn.ollamaModel || "NO MODEL").toUpperCase()}`;
 }
 
 export function isConfigured(conn: AiConnection): boolean {
   if (conn.provider === "openrouter") return !!conn.openrouterKey && !!conn.openrouterModel;
-  if (conn.provider === "ollama") return !!conn.ollamaUrl && !!conn.ollamaModel;
-  return true;
+  return !!conn.ollamaUrl && !!conn.ollamaModel;
 }
 
 function cleanUrl(url: string) {
@@ -244,11 +238,6 @@ export async function sendChat(
     if (!conn.openrouterKey) throw new Error("Add your OpenRouter key in AI Connection.");
     return { content: await chatOpenRouter(conn, messages, systemPrompt), provider: "openrouter" };
   }
-  if (conn.provider === "ollama") {
-    if (!conn.ollamaModel) throw new Error("Pick an Ollama model in AI Connection.");
-    return { content: await chatOllama(conn, messages, systemPrompt), provider: "ollama" };
-  }
-  const res = await chatWithAgent({ data: { messages } });
-  if (!res.ok) throw new Error(res.content);
-  return { content: res.content, provider: "site" };
+  if (!conn.ollamaModel) throw new Error("Pick an Ollama model in AI Connection.");
+  return { content: await chatOllama(conn, messages, systemPrompt), provider: "ollama" };
 }
