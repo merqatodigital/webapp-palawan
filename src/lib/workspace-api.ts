@@ -136,14 +136,60 @@ export function isValidUrl(url: string): boolean {
 
 /* ---------- uploads ---------- */
 
-export async function uploadFile(file: File): Promise<string> {
-  const dataUrl = await new Promise<string>((resolve, reject) => {
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+
+function readAsDataUrl(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
     const r = new FileReader();
     r.onload = () => resolve(String(r.result));
     r.onerror = () => reject(new Error("Could not read the file"));
     r.readAsDataURL(file);
   });
-  const res = await uploadWorkspaceMedia({ data: { fileName: file.name, dataUrl } });
+}
+
+/** Downscale/compress large images in the browser so uploads stay under the limit. */
+async function compressImage(file: File, maxSide = 2000, quality = 0.82): Promise<string> {
+  const dataUrl = await readAsDataUrl(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Could not decode image"));
+      el.src = dataUrl;
+    });
+    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return dataUrl;
+    ctx.drawImage(img, 0, 0, w, h);
+    let out = canvas.toDataURL("image/jpeg", quality);
+    if (out.length > MAX_UPLOAD_BYTES * 1.37) out = canvas.toDataURL("image/jpeg", 0.6);
+    return out;
+  } catch {
+    return dataUrl;
+  }
+}
+
+export async function uploadFile(file: File): Promise<string> {
+  const isImage = file.type.startsWith("image/") && file.type !== "image/gif";
+  const dataUrl =
+    isImage && file.size > 2 * 1024 * 1024 ? await compressImage(file) : await readAsDataUrl(file);
+
+  // data URLs are ~1.37x the raw byte size
+  if (dataUrl.length > MAX_UPLOAD_BYTES * 1.37) {
+    throw new Error(
+      isImage
+        ? "That image is still too large after compression. Please use a smaller file (max 25MB)."
+        : "That file is too large (max 25MB). Please compress the video or paste a YouTube link instead.",
+    );
+  }
+
+  const name = isImage ? file.name.replace(/\.[^.]+$/, "") : file.name;
+  const res = await uploadWorkspaceMedia({ data: { fileName: name, dataUrl } });
   return res.url;
 }
 

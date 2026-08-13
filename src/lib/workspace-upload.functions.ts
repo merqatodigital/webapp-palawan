@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 25 * 1024 * 1024;
 const ALLOWED = /^(image\/(png|jpe?g|webp|gif|avif)|video\/(mp4|webm|quicktime))$/;
 
 export const uploadWorkspaceMedia = createServerFn({ method: "POST" })
@@ -15,7 +15,7 @@ export const uploadWorkspaceMedia = createServerFn({ method: "POST" })
     const [, contentType, b64] = match;
     if (!ALLOWED.test(contentType)) throw new Error("Unsupported file type");
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    if (bytes.byteLength > MAX_BYTES) throw new Error("File too large (max 8MB)");
+    if (bytes.byteLength > MAX_BYTES) throw new Error("File too large (max 25MB)");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const ext = (contentType.split("/")[1] ?? "bin").replace(/[^a-z0-9]/gi, "");
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
