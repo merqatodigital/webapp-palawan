@@ -24,14 +24,23 @@ function Dot({ className = "" }: { className?: string }) {
 
 // ────── Stats Overview ──────
 
-const stats = [
-  { label: "Active Bookings", value: "12", icon: Calendar, change: "+3 today", up: true },
-  { label: "Pending Tasks", value: "7", icon: ClipboardList, change: "2 urgent", up: false },
-  { label: "Guest Messages", value: "4", icon: MessageSquare, change: "1 unread", up: false },
-  { label: "Monthly Revenue", value: "₱284K", icon: DollarSign, change: "+18%", up: true },
-];
+const stats: {
+  label: string;
+  value: string;
+  icon: typeof Calendar;
+  change: string;
+  up: boolean;
+}[] = [];
 
 function StatsRow() {
+  if (stats.length === 0) {
+    return (
+      <div className="corner border border-line p-8 text-center text-ink-dim text-[12px]">
+        <div className="c1" /><div className="c2" />
+        No live metrics connected yet.
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {stats.map((s) => (
@@ -61,15 +70,23 @@ type Workflow = {
   runs: number;
 };
 
-const workflows: Workflow[] = [
-  { id: "w1", name: "New Booking → WhatsApp Confirm", trigger: "Booking created", action: "Send WhatsApp confirmation", status: "active", lastRun: "2 min ago", runs: 142 },
-  { id: "w2", name: "Checkout → Housekeeping Alert", trigger: "Guest checks out", action: "Alert housekeeping team", status: "active", lastRun: "1 hr ago", runs: 89 },
-  { id: "w3", name: "Low Inventory → Reorder Alert", trigger: "Stock below threshold", action: "Notify manager + create PO", status: "active", lastRun: "3 hrs ago", runs: 23 },
-  { id: "w4", name: "Review Request → Post-Stay", trigger: "24h after checkout", action: "Send review request SMS", status: "paused", lastRun: "1 day ago", runs: 67 },
-  { id: "w5", name: "Weekly Revenue Report", trigger: "Every Monday 8AM", action: "Generate + email report", status: "active", lastRun: "2 days ago", runs: 12 },
-];
+const workflows: Workflow[] = [];
 
 function WorkflowsTable() {
+  if (workflows.length === 0) {
+    return (
+      <div className="corner border border-line overflow-hidden">
+        <div className="c1" /><div className="c2" />
+        <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em]">
+            <Zap className="w-4 h-4 text-accent" />
+            <span className="text-accent">AUTOMATION WORKFLOWS</span>
+          </div>
+        </div>
+        <div className="p-8 text-center text-ink-dim text-[12px]">No workflows configured yet.</div>
+      </div>
+    );
+  }
   const statusStyle = (s: Workflow["status"]) => {
     if (s === "active") return "border-accent/50 text-accent";
     if (s === "paused") return "border-ink-dim text-ink-dim";
@@ -118,14 +135,23 @@ type Task = {
   due: string;
 };
 
-const tasks: Task[] = [
-  { id: "t1", title: "Prepare Villa 3 for incoming guests", assignee: "Maria", priority: "high", due: "Today 10AM" },
-  { id: "t2", title: "Restock minibar — Room 7", assignee: "Carlos", priority: "medium", due: "Today 2PM" },
-  { id: "t3", title: "Fix pool pump filter", assignee: "Jun", priority: "high", due: "Today 11AM" },
-  { id: "t4", title: "Update weekend menu board", assignee: "Ana", priority: "low", due: "Tomorrow" },
-];
+const tasks: Task[] = [];
 
 function TaskBoard() {
+  if (tasks.length === 0) {
+    return (
+      <div className="corner border border-line overflow-hidden">
+        <div className="c1" /><div className="c2" />
+        <div className="px-4 py-3 border-b border-line bg-surface/50">
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em]">
+            <ClipboardList className="w-4 h-4 text-accent" />
+            <span className="text-accent">TODAY'S TASKS</span>
+          </div>
+        </div>
+        <div className="p-8 text-center text-ink-dim text-[12px]">No tasks yet.</div>
+      </div>
+    );
+  }
   const pColor = (p: Task["priority"]) => p === "high" ? "text-red-400" : p === "medium" ? "text-amber-400" : "text-ink-dim";
   return (
     <div className="corner border border-line overflow-hidden">
@@ -166,13 +192,24 @@ type GuestMessage = {
   status: "new" | "replied" | "auto";
 };
 
-const messages: GuestMessage[] = [
-  { id: "m1", guest: "Sarah J.", channel: "whatsapp", message: "Hi, can we check in early at 1pm?", time: "5 min ago", status: "auto" },
-  { id: "m2", guest: "Mark T.", channel: "facebook", message: "Do you have vegan options at the restaurant?", time: "12 min ago", status: "replied" },
-  { id: "m3", guest: "Elena R.", channel: "website", message: "Is the pool open tomorrow morning?", time: "1 hr ago", status: "new" },
-];
+const messages: GuestMessage[] = [];
 
 function GuestMessages() {
+  if (messages.length === 0) {
+    return (
+      <div className="corner border border-line overflow-hidden">
+        <div className="c1" /><div className="c2" />
+        <div className="px-4 py-3 border-b border-line bg-surface/50">
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em]">
+            <MessageSquare className="w-4 h-4 text-accent" />
+            <span className="text-accent">GUEST MESSAGES</span>
+            <Dot className="animate-pulse" />
+          </div>
+        </div>
+        <div className="p-8 text-center text-ink-dim text-[12px]">No messages yet.</div>
+      </div>
+    );
+  }
   const channelIcon = (c: GuestMessage["channel"]) => {
     if (c === "whatsapp") return "WA";
     if (c === "facebook") return "FB";
