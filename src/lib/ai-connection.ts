@@ -52,6 +52,7 @@ export function loadConnection(): AiConnection {
 export function saveConnection(conn: AiConnection) {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(conn));
+  window.dispatchEvent(new CustomEvent("mq-ai-connection-change"));
 }
 
 export function connectionLabel(conn: AiConnection): string {

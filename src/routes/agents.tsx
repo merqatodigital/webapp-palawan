@@ -235,11 +235,12 @@ function DemoChat() {
   const [typingText, setTypingText] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
   const [conn, setConn] = useState<AiConnection>(DEFAULT_CONNECTION);
-  const [panelOpen, setPanelOpen] = useState(false);
-
   useEffect(() => {
-    if (!panelOpen) setConn(loadConnection());
-  }, [panelOpen]);
+    const sync = () => setConn(loadConnection());
+    sync();
+    window.addEventListener("mq-ai-connection-change", sync);
+    return () => window.removeEventListener("mq-ai-connection-change", sync);
+  }, []);
   const [messages, setMessages] = useState<
     Array<{ role: string; content: string; images?: string[] }>
   >([

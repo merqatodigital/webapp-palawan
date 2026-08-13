@@ -246,7 +246,12 @@ export function AiConnectionButton({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [conn, setConn] = useState<AiConnection | null>(null);
 
-  useEffect(() => { if (!open) setConn(loadConnection()); }, [open]);
+  useEffect(() => {
+    const sync = () => setConn(loadConnection());
+    sync();
+    window.addEventListener("mq-ai-connection-change", sync);
+    return () => window.removeEventListener("mq-ai-connection-change", sync);
+  }, []);
 
   return (
     <>
