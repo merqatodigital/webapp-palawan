@@ -59,6 +59,297 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_follows: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          visitor_token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          visitor_token: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          visitor_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_follows_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_links: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          link_type: string
+          project_id: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string
+          link_type?: string
+          project_id: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          link_type?: string
+          project_id?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_media: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          kind: string
+          project_id: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_media_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_projects: {
+        Row: {
+          author_name: string
+          author_token: string | null
+          cover_image: string | null
+          created_at: string
+          description: string
+          id: string
+          is_hidden: boolean
+          pitch: string
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          author_name?: string
+          author_token?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_hidden?: boolean
+          pitch?: string
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          author_name?: string
+          author_token?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_hidden?: boolean
+          pitch?: string
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      workspace_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          project_id: string
+          visitor_token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          project_id: string
+          visitor_token: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id?: string
+          visitor_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_reactions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_revisions: {
+        Row: {
+          action: string
+          actor_name: string
+          created_at: string
+          id: string
+          project_id: string | null
+          snapshot: Json | null
+        }
+        Insert: {
+          action: string
+          actor_name?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          snapshot?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_name?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          snapshot?: Json | null
+        }
+        Relationships: []
+      }
+      workspace_tasks: {
+        Row: {
+          claimed_by: string | null
+          created_at: string
+          done: boolean
+          id: string
+          project_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          claimed_by?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          project_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          claimed_by?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          project_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_updates: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          image_url: string | null
+          kind: string
+          project_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kind?: string
+          project_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          kind?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_updates_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
