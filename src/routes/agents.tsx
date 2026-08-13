@@ -7,7 +7,11 @@ import {
   Github, Triangle, Instagram, Twitter, Linkedin, Loader2, Paperclip,
 } from "lucide-react";
 import mqLogo from "@/assets/mq-logo.png";
-import { chatWithAgent } from "@/lib/agent.functions";
+import {
+  DEFAULT_CONNECTION, connectionLabel, isConfigured, loadConnection, sendChat,
+  type AiConnection, type ChatMessage,
+} from "@/lib/ai-connection";
+import { AiConnectionButton, StatusDot } from "@/components/AiConnectionPanel";
 import { useContent } from "@/store/content";
 import type { PricingTier } from "@/store/content";
 import { AdminTrigger } from "@/components/AdminPanel";
