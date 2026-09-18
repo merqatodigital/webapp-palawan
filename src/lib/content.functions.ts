@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Json } from "@/integrations/supabase/types";
 
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const ALLOWED_UPLOAD = /^(image\/(png|jpe?g|webp|gif|avif)|video\/(mp4|webm|quicktime))$/;
+
 export const loadSiteContent = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("site_content")
@@ -44,7 +47,9 @@ export const uploadMedia = createServerFn({ method: "POST" })
     const match = data.dataUrl.match(/^data:([^;]+);base64,(.+)$/);
     if (!match) throw new Error("Invalid data URL");
     const [, contentType, b64] = match;
+    if (!ALLOWED_UPLOAD.test(contentType)) throw new Error("Unsupported file type");
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    if (bytes.byteLength > MAX_UPLOAD_BYTES) throw new Error("File too large (max 25MB)");
     const ext = (contentType.split("/")[1] ?? "bin").replace(/[^a-z0-9]/gi, "");
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
     const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}.${ext}`;
